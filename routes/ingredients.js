@@ -4,16 +4,16 @@ import { config } from 'dotenv';
 config();
 
 
-// import swaggerUi from 'swagger-ui-express';
-// import YAML from 'yamljs';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
 
 const router = express.Router();
 
-//const swaggerDocument = YAML.load('./documentary/swagger-specs.yaml');
+const swaggerDocument = YAML.load('./documentary/swagger-specs.yaml');
 
-// // mounting the Swagger UI middleware:
-// router.use('/api-docs', swaggerUi.serve);
-// router.get('/api-docs', swaggerUi.setup(swaggerDocument));
+// mounting the Swagger UI middleware:
+router.use('/api-docs', swaggerUi.serve);
+router.get('/api-docs', swaggerUi.setup(swaggerDocument));
 
 
 // GET all ingredients
@@ -36,7 +36,7 @@ router.get('/:drinkId', (req, res, next) => {
 
     const query = `
     SELECT i.*
-    FROM DrinkIngredients di
+    FROM DrinksIngredients di
     JOIN Ingredients i ON di.ingredient_id = i.id
     WHERE di.drink_id = $1
   `;

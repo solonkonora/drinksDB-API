@@ -7,6 +7,9 @@ import logger from 'morgan';
 import indexRouter from './routes/index.js';
 import ingredientsRouter from './routes/ingredients.js';
 import drinksRouter from './routes/drinks.js';
+import drinksingredientsRouter from './routes/drinksingredients.js';
+import instructionsRouter from './routes/instructions.js';
+import reviewsRouter from './routes/reviews.js'
 
 
 const app = express();
@@ -20,6 +23,10 @@ app.use(cookieParser());
 app.use('/', indexRouter);
 app.use('/ingredients', ingredientsRouter);
 app.use('/drinks', drinksRouter);
+app.use('/drinksingredients', drinksingredientsRouter);
+app.use('/instructions', instructionsRouter);
+app.use('/reviews', reviewsRouter)
+
 
 
 // catch 404 and forward to error handler

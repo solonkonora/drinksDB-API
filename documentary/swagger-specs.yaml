@@ -1,0 +1,170 @@
+openapi: 3.0.0
+info:
+  title: DrinksDB API
+  description: API documentation for DrinksDB API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/
+
+paths:
+  /recipes:
+    get:
+      summary: Get a list of drinks
+      description: Retrieve a list of drinks from the database.
+      responses:
+        '200':
+          description: A list of drinks.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+        '404':
+          description: Recipe not found.
+
+  /drinks/{recipeId}:
+    get:
+      summary: Get a drink by ID
+      description: Retrieve a drink from the database by its ID.
+      parameters:
+        - name: drinkId
+          in: path
+          description: The ID of the drink to retrieve.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The requested drink.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Drink'
+        '404':
+          description: Drink not found.
+
+    post:
+      summary: Create a new drink
+      description: Create a new drink in the database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Drink'
+      responses:
+        '200':
+          description: Drink created successfully.
+        
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Drink'
+        '500':
+          description: Failed to create Drink
+
+    put:
+      summary: Update an existing drink
+      description: Update an existing drink in the database.
+      parameters:
+        - name: drinkId
+          in: path
+          description: The ID of the drink to update.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Drink'
+      responses:
+        '200':
+          description: Drink updated successfully
+        '404':
+          description: Drink not found
+        '500':
+          description: Failed to update Drink
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Drink'
+
+    delete:
+      summary: Delete a drink
+      description: Delete a drink from the database.
+      parameters:
+        - name: drinkId
+          in: path
+          description: The ID of the drink to delete.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Drink deleted successfully.
+        '404':
+          description: Drink not found.
+        '500':
+          description: Failed to update drink
+
+components:
+  schemas:
+    Drink:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The unique identifier for the drink.
+        title:
+          type: string
+          description: The title of the drink.
+        description:
+          type: string
+          description: The description of the drink.
+        image_path:
+          type: string
+          description: The path to the image associated with the drink.
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp indicating when the drink was created.
+        updated_at:
+          type: string
+          format: date-time
+          description: The timestamp indicating when the drink was last updated.
+        category_id:
+          type: integer
+          description: The ID of the category the drink belongs to, 1,2,3,4 for breakfast, lunch, dinner, and desserts respectively.
+        # ingredients:
+        #   type: array
+        #   items:
+        #     $ref: '#/components/schemas/Ingredient'
+        #   description: The list of ingredients for the recipe.
+        # instructions:
+        #   type: array
+        #   items:
+        #     $ref: '#/components/schemas/Instruction'
+        #   description: The list of instructions for preparing the recipe.
+
+    Ingredient:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the ingredient.
+        amount:
+          type: string
+          description: The amount of the ingredient required for the recipe.
+
+    Instruction:
+      type: object
+      properties:
+        step:
+          type: string
+          description: The step number or instruction identifier.
+        description:
+          type: string
+          description: The description of the instruction.

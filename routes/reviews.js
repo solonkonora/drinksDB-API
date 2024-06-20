@@ -61,43 +61,5 @@ router.post('/:drinkId/reviews', async (req, res, next) => {
     }
 });
 
-// Update an existing review
-router.put('/:drinkId/reviews/:reviewId', async (req, res, next) => {
-    try {
-        const { drinkId, reviewId } = req.params;
-        const { rating, comment, like } = req.body;
-
-        const query = `UPDATE Reviews SET rating = $1, comment = $2, like = $3 WHERE id = $4 RETURNING *`;
-        const values = [rating, comment, like, reviewId];
-        const { rows } = await pool.query(query, values);
-
-        if (rows.length === 0) {
-            return res.status(404).json({ error: 'Review not found' });
-        }
-
-        res.status(200).json(rows[0]);
-    } catch (error) {
-        next(error);
-    }
-});
-
-// Delete a review
-router.delete('/:drinkId/reviews/:reviewId', async (req, res, next) => {
-    try {
-        const { drinkId, reviewId } = req.params;
-
-        const query = `DELETE FROM Reviews WHERE id = $1`;
-        const values = [reviewId];
-        const result = await pool.query(query, values);
-
-        if (result.rowCount === 0) {
-            return res.status(404).json({ error: 'Review not found' });
-        }
-
-        res.status(204).send();
-    } catch (error) {
-        next(error);
-    }
-});
 
 export default router;

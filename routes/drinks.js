@@ -56,6 +56,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+
 router.post('/', async (req, res) => {
   try {
     // 1) validation
@@ -71,14 +72,23 @@ SELECT 1 FROM Drinks WHERE name = $1;
       return res.status(409).json({ error: 'A drink with that name already exists' });
     }
 
-    // 2. Create the drink record
+ 
+    // 3. Upload image to Cloudinary
+    let imageUrl = null;
+    if (image_path) {
+      await setupImageFolders();
+      const uploadResult = await uploadImageToFolder(image_path, 'drinks-images');
+      imageUrl = uploadResult.secure_url;
+    }
+
+    // 4. Create the drink record
     const createDrinkQuery = `
       INSERT INTO Drinks (name, description, alcoholic, category, image_path, instructions)
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING id;
     `;
 
-    const createDrinkValues = [name, description, alcoholic, category, image_path, instructions];
+    const createDrinkValues = [name, description, alcoholic, category, imageUrl, instructions];
 
     const createDrinkResult = await pool.query(createDrinkQuery, createDrinkValues);
     const newDrinkId = createDrinkResult.rows[0].id;

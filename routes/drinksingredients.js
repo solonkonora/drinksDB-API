@@ -1,5 +1,5 @@
 import express from 'express';
-//import { createCloudinaryFolder, setupImageFolders, uploadImageToFolder } from '../db_config/cloudinary_config.js';
+import { createCloudinaryFolder, setupImageFolders, uploadImageToFolder } from '../db_config/cloudinary_config.js';
 import pool from '../db_config/db_connection.js'
 import { config } from 'dotenv';
 config();
@@ -16,6 +16,18 @@ router.use('/api-docs', swaggerUi.serve);
 router.get('/api-docs', swaggerUi.setup(swaggerDocument));
 
 // DrinksIngredients endpoint
+router.get('/', async (req, res) => {
+    try {
+      const query = 'SELECT * FROM Drinks';
+      const { rows } = await pool.query(query);
+      res.json(rows);
+    } catch (error) {
+      // res.status(500).json({ error });
+      throw err;
+    }
+  });
+
+  //get by Id
 router.get('/:drinkId/ingredients', async (req, res, next) => {
     try {
         const { drinkId } = req.params;

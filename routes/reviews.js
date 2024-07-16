@@ -1,5 +1,6 @@
 import express from 'express';
-import pool from '../db_config/db_connection.js'
+import pool from '../db_config/db_connection.js';
+import { v4 as uuidv4 } from 'uuid';
 import { config } from 'dotenv';
 config();
 
@@ -22,43 +23,51 @@ router.get('/', async (req, res, next) => {
     }
     catch (error) {
         next(error)
-    }
+    } 
+});
+
+router.get('/:id', async (req, res, next) => {
+  try {
+      const { id } = req.params; // Get the review ID from the URL
+
+      const query = `SELECT * FROM Reviews WHERE id = $1`;
+      const values = [id];
+      const { rows } = await pool.query(query, values);
+
+      if (rows.length === 1) {
+          return res.status(404).json({ error: 'Review not found' }); // Handle case where no review is found
+      }
+
+      res.json(rows[0]); // Send the specific review data
+  } catch (error) {
+      next(error);
+  }
 });
 
 
-// Get all reviews for a specific drink
-router.get('/:drinkId/reviews', async (req, res, next) => {
-    try {
-        const { drinkId } = req.params;
+// Like a review
+router.post('/', async (req, res, next) => {
+  try {
+    const { drinkId, rating, comment } = req.body; // Get data from the request body
 
-        const query = `SELECT * FROM Reviews WHERE drink_id = $1`;
-        const values = [drinkId];
-        const { rows } = await pool.query(query, values);
+    // Generate a unique id
+    const id = uuidv4(); 
 
-        res.json(rows);
-    } catch (error) {
-        next(error);
-    }
-});
-
-// Create a new review for a drink
-router.post('/:drinkId/reviews', async (req, res, next) => {
-    try {
-        const { drinkId } = req.params;
-        const { rating, comment, like } = req.body;
-
-        const query = `
-      INSERT INTO Reviews (drink_id, rating, comment, like)
+    // Construct the SQL INSERT query
+    const insertQuery = `
+      INSERT INTO Reviews (id, drinkId, rating, comment)
       VALUES ($1, $2, $3, $4)
-      RETURNING *
     `;
-        const values = [drinkId, rating, comment, like];
-        const { rows } = await pool.query(query, values);
 
-        res.status(201).json(rows[0]);
-    } catch (error) {
-        next(error);
-    }
+    // Execute the query with the provided data
+    await pool.query(insertQuery, [id, drinkId, rating, comment]);
+
+    // Send a success response
+    res.status(201).json({ message: 'Review created', id }); 
+  } catch (error) {
+    // Handle any errors that occur during the process
+    next(error); 
+  }
 });
 
 

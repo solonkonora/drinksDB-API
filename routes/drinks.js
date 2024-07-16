@@ -1,5 +1,4 @@
 import express from 'express';
-//import Joi from 'joi';
 import { createCloudinaryFolder, setupImageFolders, uploadImageToFolder } from '../db_config/cloudinary_config.js';
 import pool from '../db_config/db_connection.js'
 import { config } from 'dotenv';
@@ -24,7 +23,7 @@ async function uploadDrinkImage(imagePath) {
 }
 
 // Call the function to upload an image
-uploadDrinkImage('./images/old-fashion.png');
+//uploadDrinkImage('./images/purple.png');
 
 
 // Get all recipes
@@ -154,11 +153,6 @@ router.post('/', async (req, res, next) => {
     res.status(500).json({ error: 'Failed to create drink' });
   }
 });
-
-
-
-
-
 
 
 // Update a drink

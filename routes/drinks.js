@@ -34,7 +34,7 @@ router.get('/', async (req, res) => {
     res.json(rows);
   } catch (error) {
     // res.status(500).json({ error });
-    throw err;
+    //throw err;
   }
 });
 

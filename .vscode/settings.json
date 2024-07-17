@@ -4,7 +4,10 @@
         "drinkid",
         "drinksdb",
         "drinksingredients",
+        "HIII",
         "openapi",
+        "psql",
+        "solonkonora",
         "uuidv"
     ]
 }

@@ -1,6 +1,5 @@
 import express from 'express';
-import { createCloudinaryFolder, setupImageFolders, uploadImageToFolder } from '../db_config/cloudinary_config.js';
-import pool from '../db_config/db_connection.js'
+import pool from '../config/db_connection.js'
 import { config } from 'dotenv';
 config();
 

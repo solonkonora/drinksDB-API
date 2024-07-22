@@ -1,5 +1,5 @@
 import express from 'express';
-import pool from '../db_config/db_connection.js'
+import pool from '../config/db_connection.js'
 import { config } from 'dotenv';
 config();
 
@@ -10,11 +10,6 @@ import YAML from 'yamljs';
 const router = express.Router();
 
 const swaggerDocument = YAML.load('./documentary/swagger-specs.yaml');
-
-// mounting the Swagger UI middleware:
-router.use('/api-docs', swaggerUi.serve);
-router.get('/api-docs', swaggerUi.setup(swaggerDocument));
-
 
 // GET all ingredients
 router.get('/', (req, res, next) => {

@@ -15,8 +15,7 @@ export async function createCloudinaryFolder(folderName) {
         console.log(`Folder '${folderName}' created in Cloudinary.`);
         return response;
     } catch (error) {
-        console.error(`Error creating folder '${folderName}' in Cloudinary:`, error);
-        throw error;
+        next(error)
     }
 }
 

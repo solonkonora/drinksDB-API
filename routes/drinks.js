@@ -1,6 +1,6 @@
 import express from 'express';
-import { createCloudinaryFolder, setupImageFolders, uploadImageToFolder } from '../db_config/cloudinary_config.js';
-import pool from '../db_config/db_connection.js'
+import { createCloudinaryFolder, setupImageFolders, uploadImageToFolder } from '../config/cloudinary_config.js';
+import pool from '../config/db_connection.js'
 import { config } from 'dotenv';
 config();
 
@@ -10,10 +10,6 @@ import YAML from 'yamljs';
 const router = express.Router();
 
 const swaggerDocument = YAML.load('./documentary/swagger-specs.yaml');
-
-// mounting the Swagger UI middleware:
-router.use('/api-docs', swaggerUi.serve);
-router.get('/api-docs', swaggerUi.setup(swaggerDocument));
 
 
 async function uploadDrinkImage(imagePath) {
@@ -31,26 +27,29 @@ router.get('/', async (req, res) => {
   try {
     const query = 'SELECT * FROM Drinks';
     const { rows } = await pool.query(query);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'No drinks found' });
+    }
+
     res.json(rows);
   } catch (error) {
-    // res.status(500).json({ error });
-    //throw err;
+    res.status(500).json({ error });
   }
 });
 
 
-// Get a recipe by ID
-router.get('/:id', async (req, res) => {
+// Get a drink by ID
+router.get('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
-    const recipe = await getDrinkById(id);
-    if (!recipe) {
-      return res.status(404).json({ error: 'drink not found' });
+    const drink = await getDrinkById(id);
+    if (!drink) {
+      next(createError(404))
     }
-    res.json(recipe);
-  } catch (err) {
-    console.error('Error retrieving drink:', err);
-    res.status(500).json({ error: 'message' });
+    res.json(drink);
+  } catch (error) {
+    next(error)
   }
 });
 
@@ -152,6 +151,14 @@ router.post('/', async (req, res, next) => {
     console.error(error);
     res.status(500).json({ error: 'Failed to create drink' });
   }
+});
+
+router.param('drinkId', (req, res, next, id) => {
+  // Validate the drinkId parameter
+  if (typeof id !== 'string' || id.trim() === '') {
+    return res.status(400).json({ error: 'Invalid drinkId format' });
+  }
+  next();
 });
 
 
@@ -269,7 +276,7 @@ async function getDrinkById(id) {
     const { rows } = await pool.query(query, values);
     return rows[0];
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 

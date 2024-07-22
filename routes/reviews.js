@@ -1,19 +1,20 @@
 import express from 'express';
-import pool from '../db_config/db_connection.js';
+import pool from '../config/db_connection.js';
 import { v4 as uuidv4 } from 'uuid';
 import { config } from 'dotenv';
 config();
 
-import swaggerUi from 'swagger-ui-express';
-import YAML from 'yamljs';
-
 const router = express.Router();
 
-const swaggerDocument = YAML.load('./documentary/swagger-specs.yaml');
+// import swaggerUi from 'swagger-ui-express';
+// import YAML from 'yamljs';
 
-// mounting the Swagger UI middleware:
-router.use('/api-docs', swaggerUi.serve);
-router.get('/api-docs', swaggerUi.setup(swaggerDocument));
+
+// const swaggerDocument = YAML.load('./documentary/swagger-specs.yaml');
+
+// // mounting the Swagger UI middleware:
+// router.use('/api-docs', swaggerUi.serve);
+// router.get('/api-docs', swaggerUi.setup(swaggerDocument));
 
 router.get('/', async (req, res, next) => {
     try {

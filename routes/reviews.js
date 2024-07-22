@@ -6,16 +6,6 @@ config();
 
 const router = express.Router();
 
-// import swaggerUi from 'swagger-ui-express';
-// import YAML from 'yamljs';
-
-
-// const swaggerDocument = YAML.load('./documentary/swagger-specs.yaml');
-
-// // mounting the Swagger UI middleware:
-// router.use('/api-docs', swaggerUi.serve);
-// router.get('/api-docs', swaggerUi.setup(swaggerDocument));
-
 router.get('/', async (req, res, next) => {
     try {
         const query = 'SELECT * FROM Reviews';

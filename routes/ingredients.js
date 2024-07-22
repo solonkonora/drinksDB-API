@@ -3,13 +3,7 @@ import pool from '../config/db_connection.js'
 import { config } from 'dotenv';
 config();
 
-
-import swaggerUi from 'swagger-ui-express';
-import YAML from 'yamljs';
-
 const router = express.Router();
-
-const swaggerDocument = YAML.load('./documentary/swagger-specs.yaml');
 
 // GET all ingredients
 router.get('/', (req, res, next) => {
@@ -26,14 +20,15 @@ router.get('/', (req, res, next) => {
 });
 
 // GET ingredients for a specific drink
-router.get('/:drinkId', (req, res, next) => {
+router.get('/api/:drinkId/ingredients', (req, res, next) => {
     const { drinkId } = req.params;
 
     const query = `
     SELECT i.*
-    FROM DrinksIngredients di
+    FROM Drinks d
+    JOIN DrinksIngredients di ON d.id = di.drink_id
     JOIN Ingredients i ON di.ingredient_id = i.id
-    WHERE di.drink_id = $1
+    WHERE d.id = $1
   `;
     const values = [drinkId];
 

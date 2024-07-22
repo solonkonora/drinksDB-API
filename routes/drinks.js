@@ -1,16 +1,11 @@
 import express from 'express';
 import { createCloudinaryFolder, setupImageFolders, uploadImageToFolder } from '../config/cloudinary_config.js';
 import pool from '../config/db_connection.js'
+import validateDrinkData from '../utils/validation.js';
 import { config } from 'dotenv';
 config();
 
-import swaggerUi from 'swagger-ui-express';
-import YAML from 'yamljs';
-
 const router = express.Router();
-
-const swaggerDocument = YAML.load('./documentary/swagger-specs.yaml');
-
 
 async function uploadDrinkImage(imagePath) {
   await setupImageFolders(); // Ensure the 'drinks-images' folder exists
@@ -22,10 +17,30 @@ async function uploadDrinkImage(imagePath) {
 //uploadDrinkImage('./images/purple.png');
 
 
-// Get all recipes
+// Get all drinks
 router.get('/', async (req, res) => {
   try {
-    const query = 'SELECT * FROM Drinks';
+    const query = `
+      SELECT
+        d.id,
+        d.name,
+        d.description,
+        d.alcoholic,
+        d.category,
+        d.image_path,
+        d.instructions,
+        COALESCE(json_agg(json_build_object(
+          'name', i.name,
+          'quantity', di.quantity,
+          'measurement', di.measurement
+        )), '[]') AS ingredients
+      FROM Drinks d
+      LEFT JOIN DrinksIngredients di ON d.id = di.DrinkId
+      LEFT JOIN Ingredients i ON di.IngredientId = i.id
+      GROUP BY d.id
+      ORDER BY d.id;
+    `;
+
     const { rows } = await pool.query(query);
 
     if (rows.length === 0) {
@@ -56,6 +71,12 @@ router.get('/:id', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
   try {
     const { name, description, alcoholic, category, image_path, instructions, ingredients } = req.body;
+
+    // calling the validation function
+    const validationError = validateDrinkData({ name, description, alcoholic, category, image_path, instructions, ingredients });
+    if (validationError) {
+      return res.status(400).json(validationError);
+    }
 
     // 1. Check if a drink with the same name already exists
     const checkDrinkQuery = `
@@ -153,13 +174,7 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-router.param('drinkId', (req, res, next, id) => {
-  // Validate the drinkId parameter
-  if (typeof id !== 'string' || id.trim() === '') {
-    return res.status(400).json({ error: 'Invalid drinkId format' });
-  }
-  next();
-});
+
 
 
 // Update a drink

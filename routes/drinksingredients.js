@@ -3,26 +3,16 @@ import pool from '../config/db_connection.js'
 import { config } from 'dotenv';
 config();
 
-import swaggerUi from 'swagger-ui-express';
-import YAML from 'yamljs';
-
 const router = express.Router();
 
-const swaggerDocument = YAML.load('./documentary/swagger-specs.yaml');
-
-// mounting the Swagger UI middleware:
-router.use('/api-docs', swaggerUi.serve);
-router.get('/api-docs', swaggerUi.setup(swaggerDocument));
-
 // DrinksIngredients endpoint
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
     try {
       const query = 'SELECT * FROM Drinks';
       const { rows } = await pool.query(query);
       res.json(rows);
     } catch (error) {
-      // res.status(500).json({ error });
-      throw err;
+      next(error)
     }
   });
 

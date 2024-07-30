@@ -20,7 +20,7 @@ router.get('/', (req, res, next) => {
 });
 
 // GET ingredients for a specific drink
-router.get('/api/:drinkId/ingredients', (req, res, next) => {
+router.get('/:drinkId/ingredients', (req, res, next) => {
     const { drinkId } = req.params;
 
     const query = `
